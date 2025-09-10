@@ -1,0 +1,29 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+*.coverage
+dist/
+build/
+
+# Node/React
+node_modules/
+build/
+dist/
+.cache/
+*.log
+
+# Env / secrets
+.env
+.env.*
+*.local
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
