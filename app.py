@@ -18,7 +18,7 @@ CORS(
     resources={
         r"/qr/*": {
             "origins": [
-                os.getenv("FRONTEND_ORIGIN", "http://localhost:3000"),
+                os.getenv("FRONTEND_ORIGIN", "https://attendencefrontend.vercel.app/"),
                 "http://127.0.0.1:3000",
             ],
             "methods": ["GET", "POST", "OPTIONS"],
