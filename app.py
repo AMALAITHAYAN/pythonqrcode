@@ -1,7 +1,19 @@
-# app.py (top)
-import os, re
-from flask import Flask
+# app.py — QR token service with CORS for Vercel frontend
+import os
+import re
+import time
+import uuid
+import jwt
+from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+# -------------------
+# Config
+# -------------------
+JWT_SECRET = os.getenv("QR_JWT_SECRET", "change-me")          # ⚠️ Set a strong secret in Render env
+JWT_ISSUER = "attendance-app"
+LIFETIME = int(os.getenv("QR_TOKEN_LIFETIME_SECONDS", "300")) # default 5 minutes
+LEEWAY = 1                                                    # small clock skew
 
 app = Flask(__name__)
 
@@ -16,7 +28,6 @@ CORS(
     app,
     resources={
         r"/qr/*": {
-            # You can pass exact origins + a regex for previews
             "origins": allowed + [re.compile(r"^https://.*\.vercel\.app$")],
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
@@ -24,7 +35,6 @@ CORS(
         }
     },
 )
-
 
 # -------------------
 # Routes
@@ -42,6 +52,8 @@ def qr_token():
         "scope": "attendance:checkin",
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    if isinstance(token, bytes):  # ensure JSON serializable
+        token = token.decode("utf-8")
     return jsonify({"token": token, "expires_in": LIFETIME})
 
 
