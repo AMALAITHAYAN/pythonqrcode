@@ -3,3 +3,5 @@ requests==2.32.3
 Pillow==10.4.0
 PyJWT==2.9.0
 gunicorn
+Flask-Cors==4.0.0
+gunicorn
