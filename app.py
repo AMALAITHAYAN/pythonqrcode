@@ -1,32 +1,30 @@
-# app.py — multi-use QR tokens (no burn), 5-minute expiry, CORS enabled
-import os
-import time
-import uuid
-import jwt
-from flask import Flask, jsonify, request
+# app.py (top)
+import os, re
+from flask import Flask
 from flask_cors import CORS
 
-# Config
-JWT_SECRET = os.getenv("QR_JWT_SECRET", "change-me")          # ⚠️ set a real secret in env
-JWT_ISSUER = "attendance-app"
-LIFETIME = int(os.getenv("QR_TOKEN_LIFETIME_SECONDS", "300")) # 5 minutes
-LEEWAY = 1                                                     # small clock skew
+app = Flask(__name__)
 
-app = Flask(__name__)   # 👈 Gunicorn will look for this
+# Allow production + dev (comma-separated env), plus optional Vercel previews
+allowed_env = os.getenv(
+    "FRONTEND_ORIGINS",
+    "https://attendencefrontend.vercel.app,http://localhost:3000"
+)
+allowed = [o.strip() for o in allowed_env.split(",") if o.strip()]
+
 CORS(
     app,
     resources={
         r"/qr/*": {
-            "origins": [
-                os.getenv("FRONTEND_ORIGIN", "https://attendencefrontend.vercel.app/"),
-                "http://127.0.0.1:3000",
-            ],
+            # You can pass exact origins + a regex for previews
+            "origins": allowed + [re.compile(r"^https://.*\.vercel\.app$")],
             "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type"],
+            "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": False,
         }
     },
 )
+
 
 # -------------------
 # Routes
